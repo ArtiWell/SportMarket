@@ -30,4 +30,8 @@ public class OrderController {
        return service.getAllOrdersByClient(uuid);
     }
 
+    @DeleteMapping
+    public void deleteOrderByCode(@RequestBody DeleteOrderDTO dto) {
+        service.deleteOrderByCode(dto);
+    }
 }

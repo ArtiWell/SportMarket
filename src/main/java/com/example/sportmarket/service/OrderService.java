@@ -10,7 +10,9 @@ import com.example.sportmarket.dao.product.ProductRepository;
 import com.example.sportmarket.exception.EntityNotFoundException;
 import com.example.sportmarket.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,5 +74,9 @@ public class OrderService {
                 .stream()
                 .map(ORDER_MAPPER::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteOrderByCode(DeleteOrderDTO dto) {
+        orderRepository.deleteByCode(dto.code());
     }
 }
