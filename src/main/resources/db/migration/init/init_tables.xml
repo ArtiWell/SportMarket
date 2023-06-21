@@ -1,0 +1,116 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+      http://www.liquibase.org/xml/ns/pro
+      http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet author="Artem" id="1">
+        <preConditions>
+            <not>
+                <tableExists tableName="products"/>
+            </not>
+        </preConditions>
+        <createTable tableName="products">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" uniqueConstraintName="products_pk"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vendor_code" type="int">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="count" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="numeric(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="products"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="Artem" id="2">
+        <preConditions>
+            <not>
+                <tableExists tableName="clients"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="clients">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" uniqueConstraintName="clients_pk"/>
+            </column>
+            <column name="uuid" type="uuid">
+                <constraints nullable="false" unique="true" uniqueConstraintName="unique_client_uuid"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_vip" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_registration" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="clients"/>
+        </rollback>
+    </changeSet>
+
+
+    <changeSet author="Artem" id="3">
+        <preConditions>
+            <not>
+                <tableExists tableName="orders"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="orders">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" uniqueConstraintName="orders_pk"/>
+            </column>
+            <column name="code" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="bigint">
+                <constraints nullable="false" referencedTableName="clients" referencedColumnNames="id"
+                             foreignKeyName="orders_client.id"/>
+            </column>
+            <column name="item_id" type="bigint">
+                <constraints nullable="false" referencedTableName="products" referencedColumnNames="id"
+                             foreignKeyName="orders_products.id"/>
+            </column>
+            <column name="count" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+        <addUniqueConstraint
+                columnNames="code, client_id, item_id"
+                constraintName="order_unique"
+                tableName="orders"
+        />
+        <rollback>
+            <dropTable tableName="orders"/>
+        </rollback>
+    </changeSet>
+
+
+
+</databaseChangeLog>
