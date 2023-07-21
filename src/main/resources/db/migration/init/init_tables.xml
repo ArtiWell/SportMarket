@@ -60,7 +60,7 @@
             <column name="status_vip" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_registration" type="date">
+            <column name="date_registration" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -79,35 +79,48 @@
         </preConditions>
 
         <createTable tableName="orders">
-            <column name="id" type="bigserial">
+            <column name="id" type="uuid">
                 <constraints nullable="false" primaryKey="true" uniqueConstraintName="orders_pk"/>
-            </column>
-            <column name="code" type="int">
-                <constraints nullable="false"/>
             </column>
             <column name="client_id" type="bigint">
                 <constraints nullable="false" referencedTableName="clients" referencedColumnNames="id"
                              foreignKeyName="orders_client.id"/>
-            </column>
-            <column name="item_id" type="bigint">
-                <constraints nullable="false" referencedTableName="products" referencedColumnNames="id"
-                             foreignKeyName="orders_products.id"/>
-            </column>
-            <column name="count" type="int">
-                <constraints nullable="false"/>
             </column>
             <column name="status" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
 
         </createTable>
-        <addUniqueConstraint
-                columnNames="code, client_id, item_id"
-                constraintName="order_unique"
-                tableName="orders"
-        />
         <rollback>
             <dropTable tableName="orders"/>
+        </rollback>
+    </changeSet>
+
+
+    <changeSet id="4" author="Artem">
+        <preConditions>
+            <not>
+                <tableExists tableName="product_from_order"/>
+            </not>
+        </preConditions>
+        <createTable tableName="product_from_order">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" foreignKeyName="product_from_order"/>
+            </column>
+            <column name="order_id" type="uuid">
+                <constraints nullable="false" referencedTableName="orders" referencedColumnNames="id"
+                             foreignKeyName="product_from_order_orders.id"/>
+            </column>
+            <column name="product_id" type="bigserial">
+                <constraints nullable="false" referencedTableName="products" referencedColumnNames="id"
+                             foreignKeyName="product_from_order_products.id"/>
+            </column>
+            <column name="count" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="product_from_order"/>
         </rollback>
     </changeSet>
 

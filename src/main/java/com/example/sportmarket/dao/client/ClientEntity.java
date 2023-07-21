@@ -1,6 +1,7 @@
 package com.example.sportmarket.dao.client;
 
 import com.example.sportmarket.dao.orders.OrderEntity;
+import com.example.sportmarket.dao.product_from_order.ProductFromOrderEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +40,7 @@ public class ClientEntity {
 
     @CreationTimestamp
     @Column(name = "date_registration")
-    private Date date;
+    private Timestamp date;
 
     @OneToMany(mappedBy = "clientEntity", cascade = ALL)
     private List<OrderEntity> orderEntity;

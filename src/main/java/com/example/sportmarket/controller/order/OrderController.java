@@ -16,7 +16,7 @@ public class OrderController {
     private final OrderService service;
 
     @PostMapping("add")
-    public int addOrder(@RequestBody CreateOrderDTO order) {
+    public OrderDTO addOrder(@RequestBody CreateOrderDTO order) {
         return service.addNewOrder(order);
     }
 

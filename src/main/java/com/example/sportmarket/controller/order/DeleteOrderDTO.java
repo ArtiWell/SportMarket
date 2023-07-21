@@ -1,4 +1,7 @@
 package com.example.sportmarket.controller.order;
 
-public record DeleteOrderDTO(int code) {
+import java.util.UUID;
+
+public record DeleteOrderDTO(UUID id) {
+
 }

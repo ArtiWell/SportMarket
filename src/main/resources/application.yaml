@@ -12,6 +12,8 @@ spring:
     properties:
       hibernate:
         default_schema: ${schema:market}
+        hbm2ddl:
+          auto: validate
   data:
     web:
       pageable:

@@ -7,12 +7,10 @@ import com.example.sportmarket.dao.orders.OrderEntity;
 import com.example.sportmarket.dao.orders.OrderRepository;
 import com.example.sportmarket.dao.product.ProductEntity;
 import com.example.sportmarket.dao.product.ProductRepository;
+import com.example.sportmarket.dao.product_from_order.ProductFromOrderEntity;
 import com.example.sportmarket.exception.EntityNotFoundException;
 import com.example.sportmarket.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +31,7 @@ public class OrderService {
     private final CodeGenerator codeGenerator;
 
     @Transactional
-    public int addNewOrder(CreateOrderDTO order) {
+    public OrderDTO addNewOrder(CreateOrderDTO order) {
         ClientEntity clientEntity = clientRepository.findByUuid(order.clientUuid()).orElseThrow(
                 EntityNotFoundException::new
         );
@@ -45,23 +43,29 @@ public class OrderService {
         }
         product.setCount(product.getCount() - order.count());
 
-        OrderEntity entity = new OrderEntity();
-        entity.setCode(codeGenerator.generateCode());
-        entity.setCount(order.count());
-        entity.setProductEntity(product);
-        entity.setClientEntity(clientEntity);
+        OrderEntity orderEntity = new OrderEntity();
 
-        clientEntity.getOrderEntity().add(entity);
+        ProductFromOrderEntity productFromOrderEntity = new ProductFromOrderEntity();
+
+        productFromOrderEntity.setProductEntity(product);
+        productFromOrderEntity.setOrderEntity(orderEntity);
+        productFromOrderEntity.setCount(order.count());
+
+        orderEntity.getProductFromOrderEntities().add(productFromOrderEntity);
+        orderEntity.setClientEntity(clientEntity);
+
+        clientEntity.getOrderEntity().add(orderEntity);
 
         clientRepository.save(clientEntity);
 
-        return entity.getCode();
+        return ORDER_MAPPER.toDto(orderEntity);
     }
 
 
     @Transactional
     public void changeStatus(ChangeStatusDTO changeStatus) {
-        List<OrderEntity> entity = orderRepository.findAllByCode(changeStatus.code());
+        List<OrderEntity> entity = orderRepository.findAllById(changeStatus.id());
+
         for (OrderEntity orderEntity : entity) {
             orderEntity.setStatus(changeStatus.status());
         }
@@ -76,7 +80,8 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteOrderByCode(DeleteOrderDTO dto) {
-        orderRepository.deleteByCode(dto.code());
+        orderRepository.deleteById(dto.id());
     }
 }
